@@ -39,16 +39,15 @@ public final class JinahyaValidatorFactoryUtils {
     // -----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Applies the specified second function to the validator which the specified first function gets from the
-     * specified validator factory.
+     * Applies the specified second function to the validator which the specified first function gets from the specified
+     * validator factory.
      *
      * @param factory   the validator factory to get the validator from.
      * @param function1 the function which gets the validator from the {@code factory}.
      * @param function2 the function to apply to the validator.
      * @param <R>       the type of the result.
      * @return the result of the {@code function2}.
-     * @throws NullPointerException when any argument is {@code null}, or the {@code function1} returns
-     *                              {@code null}.
+     * @throws NullPointerException when any argument is {@code null}, or the {@code function1} returns {@code null}.
      */
     public static <R> R applyValidator(final ValidatorFactory factory,
                                        final Function<? super ValidatorFactory, ? extends Validator> function1,
@@ -66,8 +65,7 @@ public final class JinahyaValidatorFactoryUtils {
      * @param function the function to apply to the validator.
      * @param <R>      the type of the result.
      * @return the result of the {@code function}.
-     * @throws NullPointerException when either argument is {@code null}, or the {@code factory} returns
-     *                              {@code null}.
+     * @throws NullPointerException when either argument is {@code null}, or the {@code factory} returns {@code null}.
      * @see ValidatorFactory#getValidator()
      */
     public static <R> R applyValidator(final ValidatorFactory factory,

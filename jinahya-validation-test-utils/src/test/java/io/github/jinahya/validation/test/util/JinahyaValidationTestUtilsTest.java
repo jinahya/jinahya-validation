@@ -35,35 +35,55 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+/**
+ * Tests {@link JinahyaValidationTestUtils}.
+ */
 class JinahyaValidationTestUtilsTest {
 
+    /**
+     * Tests {@link JinahyaValidationTestUtils#applyCachedValidatorFactory(Supplier, Function)}.
+     */
     @DisplayName("applyCachedValidatorFactory(supplier, function)")
     @Nested
-    class ApplyCachedValidatorFactory {
+    class ApplyCachedValidatorFactoryTest {
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code supplier} is {@code null}.
+         */
         @Test
-        void __nullSupplier() {
+        void _throwNullPointerException_nullSupplier() {
             assertThatThrownBy(() -> JinahyaValidationTestUtils.applyCachedValidatorFactory(
                     null, Function.identity()))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code function} is {@code null}.
+         */
         @Test
-        void __nullFunction() {
+        void _throwNullPointerException_nullFunction() {
             assertThatThrownBy(() -> JinahyaValidationTestUtils.applyCachedValidatorFactory(
                     () -> mock(ValidatorFactory.class), null))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code supplier} supplies
+         * {@code null}.
+         */
         @Test
-        void __supplierSuppliesNull() {
+        void _throwNullPointerException_supplierSuppliesNull() {
             assertThatThrownBy(() -> JinahyaValidationTestUtils.applyCachedValidatorFactory(
                     () -> null, Function.identity()))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method builds the factory once for the same supplier, returns the same factory afterward,
+         * and does not close it.
+         */
         @Test
-        void __sameSupplier_sameFactoryBuiltOnceAndNotClosed() {
+        void _sameFactoryBuiltOnceNotClosed_sameSupplier() {
             final var factory = mock(ValidatorFactory.class);
             final var count = new AtomicInteger();
             final Supplier<ValidatorFactory> supplier = () -> {
@@ -78,8 +98,11 @@ class JinahyaValidationTestUtilsTest {
             verify(factory, never()).close();
         }
 
+        /**
+         * Verifies that the method caches a separate factory for each supplier.
+         */
         @Test
-        void __differentSuppliers_differentFactories() {
+        void _differentFactories_differentSuppliers() {
             final var factory1 = mock(ValidatorFactory.class);
             final var factory2 = mock(ValidatorFactory.class);
             final Supplier<ValidatorFactory> supplier1 = () -> factory1;

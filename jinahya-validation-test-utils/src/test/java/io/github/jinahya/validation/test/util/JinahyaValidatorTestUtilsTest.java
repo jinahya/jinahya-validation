@@ -33,68 +33,119 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * Tests {@link JinahyaValidatorTestUtils}.
+ */
 class JinahyaValidatorTestUtilsTest {
 
+    /**
+     * A validation group other than the default.
+     */
     private interface Group {
 
     }
 
+    /**
+     * A bean with a constraint in the default group, and another in the {@link Group}.
+     *
+     * @param a a value; must not be {@code null} in the default group.
+     * @param b a value; must not be {@code null} in the {@link Group}.
+     */
     private record Bean(@NotNull String a, @NotNull(groups = Group.class) String b) {
 
     }
 
+    /**
+     * The factory which {@link #buildFactory()} builds, and {@link #closeFactory()} closes.
+     */
     private static ValidatorFactory factory;
 
+    /**
+     * The validator of the {@link #factory}.
+     */
     private static Validator validator;
 
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Builds the {@link #factory} with the provider of the active profile, and gets the {@link #validator} from it.
+     */
     @BeforeAll
     static void buildFactory() {
         factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
 
+    /**
+     * Closes the {@link #factory}.
+     */
     @AfterAll
     static void closeFactory() {
         factory.close();
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Tests {@link JinahyaValidatorTestUtils#assertValid(Validator, Object, Class[])}.
+     */
     @DisplayName("assertValid(validator, object, groups)")
     @Nested
-    class AssertValid {
+    class AssertValidTest {
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code validator} is {@code null}.
+         */
         @Test
-        void __nullValidator() {
+        void _throwNullPointerException_nullValidator() {
             assertThatThrownBy(() -> JinahyaValidatorTestUtils.assertValid(null, new Bean("a", "b")))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code object} is {@code null}.
+         */
         @Test
-        void __nullObject() {
+        void _throwNullPointerException_nullObject() {
             assertThatThrownBy(() -> JinahyaValidatorTestUtils.assertValid(validator, null))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code groups} is {@code null}.
+         */
         @Test
-        void __nullGroups() {
+        void _throwNullPointerException_nullGroups() {
             assertThatThrownBy(() -> JinahyaValidatorTestUtils.assertValid(
                     validator, new Bean("a", "b"), (Class<?>[]) null))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method returns the object when it is valid.
+         */
         @Test
-        void __valid_returnsObject() {
+        void _returnObject_validObject() {
             final var object = new Bean("a", null);
             assertThat(JinahyaValidatorTestUtils.assertValid(validator, object)).isSameAs(object);
         }
 
+        /**
+         * Verifies that the method throws an {@link AssertionError} when the object is invalid against the default
+         * group.
+         */
         @Test
-        void __invalid_throwsAssertionError() {
+        void _throwAssertionError_invalidObject() {
             assertThatThrownBy(() -> JinahyaValidatorTestUtils.assertValid(validator, new Bean(null, "b")))
                     .isInstanceOf(AssertionError.class);
         }
 
+        /**
+         * Verifies that the method throws an {@link AssertionError} when the object is invalid against the specified
+         * group.
+         */
         @Test
-        void __invalidAgainstSpecifiedGroup_throwsAssertionError() {
+        void _throwAssertionError_invalidAgainstSpecifiedGroup() {
             assertThatThrownBy(() -> JinahyaValidatorTestUtils.assertValid(validator, new Bean("a", null), Group.class))
                     .isInstanceOf(AssertionError.class);
         }

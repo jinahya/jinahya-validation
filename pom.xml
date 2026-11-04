@@ -64,9 +64,8 @@
     <version.maven-failsafe>${version.maven-surefire}</version.maven-failsafe>
     <version.maven-surefire>3.6.0</version.maven-surefire>
     <!-- ======================================== platform / validation provider ================ -->
-    <!-- The defaults below are the jakarta-ee-11-hibernate-validator profile's; each of the four
-         jakarta-ee-*-* profiles overrides the platform BOM, the EL implementation, and the version of
-         its own validation provider. -->
+    <!-- The defaults below are the jakarta-ee-11 profile's; the jakarta-ee-10 profile overrides the
+         platform BOM, the EL implementation, and the versions of both validation providers. -->
     <!-- https://jakarta.ee/specifications/platform/11/ -->
     <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
     <!-- 11.0.0 manages: jakarta.validation-api 3.1.1, jakarta.el-api 6.0.1, -->
@@ -169,7 +168,7 @@
       <artifactId>jakarta.validation-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    <!-- the validation provider comes from one of the jakarta-ee-*-* profiles -->
+    <!-- the validation provider comes from the hibernate-validator or the apache-bval profile -->
     <dependency>
       <groupId>org.glassfish.expressly</groupId>
       <artifactId>expressly</artifactId>
@@ -313,21 +312,27 @@
             </goals>
           </execution>
           <execution>
-            <id>enforce-require-validation-provider-profile</id>
+            <id>enforce-require-platform-and-provider-profiles</id>
             <goals>
               <goal>enforce</goal>
             </goals>
             <configuration>
               <rules>
-                <!-- The validation provider comes from an activeByDefault profile, which Maven drops as soon
-                     as any other profile of this POM is named on the command line; `-Pfailsafe` alone would
-                     leave no provider on the test classpath, and the tests would fail with
-                     NoProviderFoundException, far from the cause. -->
+                <!-- The platform and the validation provider each come from an activeByDefault profile, and
+                     Maven drops every activeByDefault profile of this POM as soon as any profile of it is named
+                     on the command line; `-Pfailsafe`, or `-Papache-bval` alone, would leave the build without a
+                     platform or a provider, and it would fail much later, far from the cause. -->
                 <requireProperty>
-                  <property>validation-provider-profile.active</property>
-                  <message>No validation provider profile is active. Naming any other profile of the root POM
-                    on the command line (for example -Pfailsafe) deactivates the activeByDefault one. Name a
-                    provider together with it, e.g., -Pfailsafe,jakarta-ee-11-hibernate-validator.</message>
+                  <property>jakarta-ee</property>
+                  <message>No platform profile is active. Naming any profile of the root POM on the command line
+                    deactivates both activeByDefault ones; name a platform and a provider together, e.g.,
+                    -Pjakarta-ee-11,hibernate-validator.</message>
+                </requireProperty>
+                <requireProperty>
+                  <property>validation-provider</property>
+                  <message>No validation provider profile is active. Naming any profile of the root POM on the
+                    command line deactivates both activeByDefault ones; name a platform and a provider together,
+                    e.g., -Pjakarta-ee-11,hibernate-validator.</message>
                 </requireProperty>
               </rules>
             </configuration>
@@ -377,11 +382,32 @@
         <version>${version.maven-surefire}</version>
         <configuration>
           <skipAfterFailureCount>1</skipAfterFailureCount>
-          <systemPropertyVariables>
-            <validation.provider>${validation.provider}</validation.provider>
-          </systemPropertyVariables>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <!-- Test sources specific to the active platform, the active provider, or the combination of
+                 both, in addition to src/test/java; a directory which does not exist is skipped, so create
+                 one only when there is a test which needs it. -->
+            <id>add-platform-and-provider-test-sources</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/test/java-${jakarta-ee}</source>
+                <source>src/test/java-${validation-provider}</source>
+                <source>src/test/java-${jakarta-ee}-${validation-provider}</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -413,59 +439,44 @@
   </build>
 
   <profiles>
-    <!-- ====================================== platform x validation provider ================ -->
-    <!-- Two axes, each a genuine choice: the platform (Jakarta EE 10 / Validation 3.0, or Jakarta EE 11 /
-         Validation 3.1), and the provider which implements it (Hibernate Validator, or Apache BVal).
-         Each profile picks one of each, so the API this project compiles against always matches the
-         provider it is tested with. Exactly one must be active; see the
-         enforce-require-validation-provider-profile execution. -->
+    <!-- ================================================================ platform ================ -->
+    <!-- One axis of two: the platform, which decides the Jakarta Validation API this project compiles
+         against, and the versions of every provider which implements it. Name one together with a
+         provider, e.g., -Pjakarta-ee-10,apache-bval; see the
+         enforce-require-platform-and-provider-profiles execution. -->
     <profile>
-      <id>jakarta-ee-10-hibernate-validator</id>
-      <!-- Jakarta Validation 3.0 / Jakarta EE 10; https://hibernate.org/validator/releases/8.0/ -->
+      <id>jakarta-ee-10</id>
+      <!-- Jakarta Validation 3.0 / Jakarta EE 10 -->
       <properties>
-        <validation-provider-profile.active>true</validation-provider-profile.active>
-        <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
+        <jakarta-ee>jakarta-ee-10</jakarta-ee>
         <version.jakarta.jakartaee-bom>10.0.0</version.jakarta.jakartaee-bom>
         <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
+        <!-- https://hibernate.org/validator/releases/8.0/ -->
         <version.org.hibernate.validator>8.0.6.Final</version.org.hibernate.validator>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.hibernate.validator</groupId>
-          <artifactId>hibernate-validator</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>jakarta-ee-10-apache-bval</id>
-      <!-- Jakarta Validation 3.0 / Jakarta EE 10; https://bval.apache.org/ -->
-      <properties>
-        <validation-provider-profile.active>true</validation-provider-profile.active>
-        <validation.provider>org.apache.bval.jsr.ApacheValidationProvider</validation.provider>
-        <version.jakarta.jakartaee-bom>10.0.0</version.jakarta.jakartaee-bom>
-        <version.org.glassfish.expressly>5.0.0</version.org.glassfish.expressly>
         <version.org.apache.bval>3.0.2</version.org.apache.bval>
       </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.bval</groupId>
-          <artifactId>bval-jsr</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
     </profile>
     <profile>
-      <id>jakarta-ee-11-hibernate-validator</id>
-      <!-- Jakarta Validation 3.1 / Jakarta EE 11; https://hibernate.org/validator/releases/9.1/ -->
+      <id>jakarta-ee-11</id>
+      <!-- Jakarta Validation 3.1 / Jakarta EE 11; the versions in <properties> are this profile's -->
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <validation-provider-profile.active>true</validation-provider-profile.active>
-        <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
-        <version.org.glassfish.expressly>6.0.0</version.org.glassfish.expressly>
+        <jakarta-ee>jakarta-ee-11</jakarta-ee>
+      </properties>
+    </profile>
+    <!-- ===================================================== validation provider ================ -->
+    <!-- The other axis: the provider which implements the platform's Jakarta Validation, at the version
+         which the active platform profile sets. -->
+    <profile>
+      <id>hibernate-validator</id>
+      <!-- https://hibernate.org/validator/ -->
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <validation-provider>hibernate-validator</validation-provider>
       </properties>
       <dependencies>
         <dependency>
@@ -476,13 +487,10 @@
       </dependencies>
     </profile>
     <profile>
-      <id>jakarta-ee-11-apache-bval</id>
-      <!-- Jakarta Validation 3.1 / Jakarta EE 11; https://bval.apache.org/ -->
+      <id>apache-bval</id>
+      <!-- https://bval.apache.org/ -->
       <properties>
-        <validation-provider-profile.active>true</validation-provider-profile.active>
-        <validation.provider>org.apache.bval.jsr.ApacheValidationProvider</validation.provider>
-        <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
-        <version.org.glassfish.expressly>6.0.0</version.org.glassfish.expressly>
+        <validation-provider>apache-bval</validation-provider>
       </properties>
       <dependencies>
         <dependency>

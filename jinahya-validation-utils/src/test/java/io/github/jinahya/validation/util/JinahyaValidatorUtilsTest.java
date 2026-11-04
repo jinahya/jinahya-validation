@@ -33,65 +33,112 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * Tests {@link JinahyaValidatorUtils}.
+ */
 class JinahyaValidatorUtilsTest {
 
+    /**
+     * A validation group other than the default.
+     */
     private interface Group {
+
     }
 
+    /**
+     * A bean with a constraint in the default group, and another in the {@link Group}.
+     *
+     * @param a a value; must not be {@code null} in the default group.
+     * @param b a value; must not be {@code null} in the {@link Group}.
+     */
     private record Bean(@NotNull String a, @NotNull(groups = Group.class) String b) {
+
     }
 
+    /**
+     * The factory which {@link #buildFactory()} builds, and {@link #closeFactory()} closes.
+     */
     private static ValidatorFactory factory;
 
+    /**
+     * The validator of the {@link #factory}.
+     */
     private static Validator validator;
 
+    /**
+     * Builds the {@link #factory} with the provider of the active profile, and gets the {@link #validator} from it.
+     */
     @BeforeAll
     static void buildFactory() {
         factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
 
+    /**
+     * Closes the {@link #factory}.
+     */
     @AfterAll
     static void closeFactory() {
         factory.close();
     }
 
+    /**
+     * Tests {@link JinahyaValidatorUtils#validate(Validator, Object, Class[])}.
+     */
     @DisplayName("validate(validator, object, groups)")
     @Nested
-    class Validate {
+    class ValidateTest {
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code validator} is {@code null}.
+         */
         @Test
-        void __nullValidator() {
+        void _throwNullPointerException_nullValidator() {
             assertThatThrownBy(() -> JinahyaValidatorUtils.validate(null, new Bean("a", "b")))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code object} is {@code null}.
+         */
         @Test
-        void __nullObject() {
+        void _throwNullPointerException_nullObject() {
             assertThatThrownBy(() -> JinahyaValidatorUtils.validate(validator, null))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method throws a {@link NullPointerException} when the {@code groups} is {@code null}.
+         */
         @Test
-        void __nullGroups() {
+        void _throwNullPointerException_nullGroups() {
             assertThatThrownBy(() -> JinahyaValidatorUtils.validate(validator, new Bean("a", "b"), (Class<?>[]) null))
                     .isInstanceOf(NullPointerException.class);
         }
 
+        /**
+         * Verifies that the method returns no constraint violation for a valid object.
+         */
         @Test
-        void __valid() {
+        void _empty_validObject() {
             assertThat(JinahyaValidatorUtils.validate(validator, new Bean("a", "b"))).isEmpty();
         }
 
+        /**
+         * Verifies that the method validates against the default group when no group is specified.
+         */
         @Test
-        void __invalidAgainstDefaultGroup() {
+        void _violationOfDefaultGroup_noGroups() {
             assertThat(JinahyaValidatorUtils.validate(validator, new Bean(null, null)))
                     .singleElement()
                     .satisfies(v -> assertThat(v.getPropertyPath()).hasToString("a"));
         }
 
+        /**
+         * Verifies that the method validates against the specified group only.
+         */
         @Test
-        void __invalidAgainstSpecifiedGroup() {
+        void _violationOfSpecifiedGroup_groupSpecified() {
             assertThat(JinahyaValidatorUtils.validate(validator, new Bean(null, null), Group.class))
                     .singleElement()
                     .satisfies(v -> assertThat(v.getPropertyPath()).hasToString("b"));
