@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.github.jinahya</groupId>
     <artifactId>jinahya-validation</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
   </parent>
 
   <artifactId>jinahya-validation-test-utils</artifactId>
