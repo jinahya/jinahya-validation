@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+         child.project.url.inherit.append.path="false">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -15,7 +16,9 @@
 
   <name>${project.artifactId}</name>
   <description>Jakarta Validation extensions</description>
-  <url>https://github.com/jinahya/${project.artifactId}</url>
+  <!-- url, scm, and issueManagement name this repository literally, never ${project.artifactId}, and are inherited
+       unchanged (the inherit.append.path attributes): every module is in this one repository -->
+  <url>https://github.com/jinahya/jinahya-validation</url>
   <inceptionYear>2026</inceptionYear>
   <organization>
     <name>Jinahya, Inc.</name>
@@ -42,15 +45,16 @@
     <module>jinahya-validation-11</module>
   </modules>
 
-  <scm>
-    <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:git@github.com:jinahya/${project.artifactId}.git</developerConnection>
-    <url>https://github.com/jinahya/${project.artifactId}</url>
+  <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false"
+       child.scm.url.inherit.append.path="false">
+    <connection>scm:git:git@github.com:jinahya/jinahya-validation.git</connection>
+    <developerConnection>scm:git:git@github.com:jinahya/jinahya-validation.git</developerConnection>
+    <url>https://github.com/jinahya/jinahya-validation</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/jinahya/${project.artifactId}/issues</url>
+    <url>https://github.com/jinahya/jinahya-validation/issues</url>
   </issueManagement>
 
   <properties>
