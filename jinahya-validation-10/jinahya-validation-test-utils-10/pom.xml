@@ -4,19 +4,27 @@
 
   <parent>
     <groupId>io.github.jinahya</groupId>
-    <artifactId>jinahya-validation</artifactId>
+    <artifactId>jinahya-validation-10</artifactId>
     <version>0.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jinahya-validation-test-utils</artifactId>
+  <artifactId>jinahya-validation-test-utils-10</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Test utilities for Jakarta Validation</description>
+  <description>Test utilities for Jakarta Validation, for Jakarta EE 10 (Jakarta Validation 3.0)</description>
+
+  <properties>
+    <shared.module>jinahya-validation-test-utils</shared.module>
+    <!-- AssertJ is a compile dependency of this module, so it must run on Java SE 11, which 4.x does not; 3.27 is the
+         latest series which does -->
+    <!-- https://central.sonatype.com/artifact/org.assertj/assertj-bom/versions -->
+    <version.org.assertj>3.27.7</version.org.assertj>
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>io.github.jinahya</groupId>
-      <artifactId>jinahya-validation-utils</artifactId>
+      <artifactId>jinahya-validation-utils-10</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>

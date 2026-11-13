@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.jinahya</groupId>
+    <artifactId>jinahya-validation</artifactId>
+    <version>0.0.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>jinahya-validation-11</artifactId>
+  <packaging>pom</packaging>
+
+  <name>${project.artifactId}</name>
+  <description>Jakarta Validation extensions for Jakarta EE 11 (Jakarta Validation 3.1)</description>
+
+  <modules>
+    <module>jinahya-validation-utils-11</module>
+    <module>jinahya-validation-test-utils-11</module>
+  </modules>
+
+  <properties>
+    <jakartaee>11</jakartaee>
+    <!-- https://jakarta.ee/specifications/platform/11/ ; Jakarta EE 11 requires Java SE 17 or higher -->
+    <!-- the release of the main classes; the root derives maven.compiler.target and maven.compiler.release from it -->
+    <maven.compiler.source>17</maven.compiler.source>
+    <!-- https://jakarta.ee/specifications/platform/11/ -->
+    <!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
+    <!-- 11.0.0 manages: jakarta.validation-api 3.1.1, jakarta.el-api 6.0.1 -->
+    <version.jakarta.jakartaee-bom>11.0.0</version.jakarta.jakartaee-bom>
+    <!-- https://bval.apache.org/ -->
+    <!-- https://central.sonatype.com/artifact/org.apache.bval/bval-jsr/versions -->
+    <!-- bval-jsr 3.1 / Jakarta Validation 3.1 -->
+    <version.org.apache.bval>3.1.0</version.org.apache.bval>
+    <!-- https://docs.jboss.org/hibernate/validator/9.1/reference/en-US/html_single/#validator-gettingstarted-uel -->
+    <!-- https://central.sonatype.com/artifact/org.glassfish.expressly/expressly/versions -->
+    <!-- expressly 6.0.0 / Jakarta Expression Language 6.0 -->
+    <version.org.glassfish.expressly>6.0.0</version.org.glassfish.expressly>
+    <!-- https://hibernate.org/validator/releases/9.1/ -->
+    <!-- https://central.sonatype.com/artifact/org.hibernate.validator/hibernate-validator/versions -->
+    <!-- hibernate-validator 9.1 / Jakarta Validation 3.1 -->
+    <version.org.hibernate.validator>9.1.6.Final</version.org.hibernate.validator>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency><!-- https://central.sonatype.com/artifact/jakarta.platform/jakarta.jakartaee-bom/versions -->
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>${version.jakarta.jakartaee-bom}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.github.jinahya</groupId>
+        <artifactId>jinahya-validation-test-utils-11</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.jinahya</groupId>
+        <artifactId>jinahya-validation-utils-11</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.bval</groupId>
+        <artifactId>bval-jsr</artifactId>
+        <version>${version.org.apache.bval}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.expressly</groupId>
+        <artifactId>expressly</artifactId>
+        <version>${version.org.glassfish.expressly}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>${version.org.hibernate.validator}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator-test-utils</artifactId>
+        <version>${version.org.hibernate.validator}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- the validation provider comes from the hibernate-validator or the apache-bval profile -->
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- The minimum Java SE of this generation, which the main classes are compiled for; the root's
+                 enforce-require-test-java-version may require a newer JDK to build, for the test classes. -->
+            <id>enforce-require-jakartaee-java-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[${maven.compiler.release},)</version>
+                  <message>Jakarta EE ${jakartaee} requires Java SE ${maven.compiler.release} or newer.</message>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- What the main classes need at runtime must run on this generation's minimum Java SE, too; only the
+                 test scope is free to need the build's JDK. Bound after compile, when the reactor can resolve this
+                 project's own modules, which the rule resolves before it excludes them. -->
+            <id>enforce-jakartaee-bytecode-version</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>${maven.compiler.release}</maxJdkVersion>
+                  <ignoredScopes>
+                    <ignoredScope>test</ignoredScope>
+                  </ignoredScopes>
+                  <excludes>
+                    <!-- this project's own modules, compiled for maven.compiler.release, and not packaged yet when
+                         this rule runs in a reactor -->
+                    <exclude>io.github.jinahya:jinahya-validation-*</exclude>
+                  </excludes>
+                </enforceBytecodeVersion>
+              </rules>
+            </configuration>
+          </execution>
+          <execution>
+            <id>enforce-require-provider-profile</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!-- The provider comes from an activeByDefault profile, which Maven drops as soon as another
+                     profile of this POM is named on the command line; `-P!hibernate-validator` alone would leave
+                     the build without a provider, and it would fail much later, far from the cause. -->
+                <requireProperty>
+                  <property>validation-provider</property>
+                  <message>No validation provider profile is active; name one, e.g., -Papache-bval.</message>
+                </requireProperty>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!-- The one profile axis: the provider which implements Jakarta Validation 3.1, at the version above. -->
+    <profile>
+      <id>hibernate-validator</id>
+      <!-- https://hibernate.org/validator/ -->
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <validation-provider>hibernate-validator</validation-provider>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.hibernate.validator</groupId>
+          <artifactId>hibernate-validator</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>apache-bval</id>
+      <!-- https://bval.apache.org/ -->
+      <properties>
+        <validation-provider>apache-bval</validation-provider>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.bval</groupId>
+          <artifactId>bval-jsr</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+</project>

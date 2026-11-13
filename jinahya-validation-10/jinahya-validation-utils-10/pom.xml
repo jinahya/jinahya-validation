@@ -4,13 +4,17 @@
 
   <parent>
     <groupId>io.github.jinahya</groupId>
-    <artifactId>jinahya-validation</artifactId>
+    <artifactId>jinahya-validation-10</artifactId>
     <version>0.0.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jinahya-validation-utils</artifactId>
+  <artifactId>jinahya-validation-utils-10</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Utilities for Jakarta Validation</description>
+  <description>Utilities for Jakarta Validation, for Jakarta EE 10 (Jakarta Validation 3.0)</description>
+
+  <properties>
+    <shared.module>jinahya-validation-utils</shared.module>
+  </properties>
 
 </project>
