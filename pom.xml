@@ -10,7 +10,7 @@
 
   <groupId>io.github.jinahya</groupId>
   <artifactId>jinahya-validation</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>${project.artifactId}</name>
@@ -48,7 +48,7 @@
     <connection>scm:git:git@github.com:jinahya/jinahya-validation.git</connection>
     <developerConnection>scm:git:git@github.com:jinahya/jinahya-validation.git</developerConnection>
     <url>https://github.com/jinahya/jinahya-validation</url>
-    <tag>0.0.3</tag>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
