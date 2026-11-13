@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
-         child.project.url.inherit.append.path="false">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" child.project.url.inherit.append.path="false">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -94,14 +93,16 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency><!-- https://central.sonatype.com/artifact/org.assertj/assertj-bom/versions -->
+      <dependency>
+        <!-- https://central.sonatype.com/artifact/org.assertj/assertj-bom/versions -->
         <groupId>org.assertj</groupId>
         <artifactId>assertj-bom</artifactId>
         <version>${version.org.assertj}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency><!-- https://search.maven.org/artifact/org.junit/junit-bom -->
+      <dependency>
+        <!-- https://search.maven.org/artifact/org.junit/junit-bom -->
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <version>${version.org.junit}</version>
@@ -251,7 +252,8 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>3.7.0</version>
         <dependencies>
-          <dependency><!-- enforceBytecodeVersion, which each jinahya-validation-NN parent uses -->
+          <dependency>
+            <!-- enforceBytecodeVersion, which each jinahya-validation-NN parent uses -->
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>extra-enforcer-rules</artifactId>
             <!-- https://central.sonatype.com/artifact/org.codehaus.mojo/extra-enforcer-rules/versions -->
