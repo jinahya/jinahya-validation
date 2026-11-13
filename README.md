@@ -36,7 +36,14 @@ Each implementation is kept on the newest release of the series aligned with its
 The root `pom.xml` holds only what is the same for every generation (JUnit, Mockito, AssertJ, Lombok, SLF4J, the
 plugins).
 
-Update the tables below whenever any of those versions changes.
+Each generation documents its environment and its version alignment in its own `README.md`; update it whenever its
+`pom.xml` changes.
+
+| Jakarta EE | Module | Jakarta Validation | Java SE, minimum | Status |
+| --- | --- | --- | --- | --- |
+| 10 | [`jinahya-validation-10`](jinahya-validation-10/README.md) | 3.0 | 11 | limited support upstream |
+| 11 | [`jinahya-validation-11`](jinahya-validation-11/README.md) | 3.1 | 17 | current |
+| 12 | none yet | 4.0 | | not released; see [below](#jakarta-ee-12) |
 
 ### Java versions
 
@@ -45,39 +52,12 @@ Update the tables below whenever any of those versions changes.
 * **What the main classes need at runtime** (every dependency outside the `test` scope, `provided` included) must run
   on that minimum, too; each generation enforces it with `enforceBytecodeVersion`.
   That is why `jinahya-validation-test-utils-10`, which ships AssertJ at `compile` scope, is on AssertJ 3.27, while the
-  rest of the build is on AssertJ 4.
+  rest of the build is on AssertJ 4 (see [its README](jinahya-validation-10/README.md)).
 * **The build:** one JDK for the whole project, the latest LTS which can still compile for every generation's minimum
   (now JDK 25; e.g., `jenv local 25`).
   The test classes are compiled for it (`maven.compiler.testSource`), and the enforcer requires it.
 * **Test dependencies** (JUnit, Mockito, AssertJ, Lombok, SLF4J) are at their latest releases which support that JDK,
   in every generation.
-
-### Jakarta EE 10
-
-`jinahya-validation-10`; limited support upstream.
-
-| | Version from the EE 10 BOM | Implementation | In this build | Latest of its series | Status |
-| --- | --- | --- | --- | --- | --- |
-| Jakarta EE Platform | `jakarta.jakartaee-bom` 10.0.0 | | | 10.0.0 | current |
-| Java SE | 11 or higher | | main classes `--release 11` | | enforced |
-| Jakarta Validation 3.0 | `jakarta.validation-api` 3.0.2 | Hibernate Validator 8.0 | 8.0.6.Final | 8.0.6.Final | current; the 8.0 series is in limited support |
-| Jakarta Validation 3.0 | `jakarta.validation-api` 3.0.2 | Apache BVal 3.0 (`bval-jsr`) | 3.0.2 | 3.0.2 | current |
-| Jakarta Expression Language 5.0 | `jakarta.el-api` 5.0.1 | Expressly 5.0 (for Hibernate Validator) | 5.0.0 | 5.0.0 | current |
-
-`jinahya-validation-test-utils-10` ships AssertJ 3.27.7 at `compile` scope, the latest series which runs on Java 11;
-AssertJ 4 requires Java 17.
-
-### Jakarta EE 11
-
-`jinahya-validation-11`; the current generation.
-
-| | Version from the EE 11 BOM | Implementation | In this build | Latest of its series | Status |
-| --- | --- | --- | --- | --- | --- |
-| Jakarta EE Platform | `jakarta.jakartaee-bom` 11.0.0 | | | 11.0.0 | current |
-| Java SE | 17 or higher | | main classes `--release 17` | | enforced |
-| Jakarta Validation 3.1 | `jakarta.validation-api` 3.1.1 | Hibernate Validator 9.1 | 9.1.6.Final | 9.1.6.Final | current; 9.2, also Jakarta Validation 3.1, is at 9.2.0.CR2 |
-| Jakarta Validation 3.1 | `jakarta.validation-api` 3.1.1 | Apache BVal 3.1 (`bval-jsr`) | 3.1.0 | 3.1.0 | current |
-| Jakarta Expression Language 6.0 | `jakarta.el-api` 6.0.1 | Expressly 6.0 (for Hibernate Validator) | 6.0.0 | 6.0.0 | current |
 
 ### Jakarta EE 12
 
@@ -100,7 +80,7 @@ Not released, so there is no `jinahya-validation-12` yet: no `jakarta.jakartaee-
 2. In its `pom.xml`, set `jakartaee`, `maven.compiler.source` (the generation's minimum Java SE), the BOM, and each
    provider's and Expressly's version; leave a provider out, with its profile, until it has a series for the
    generation.
-3. Add the module to the root `pom.xml`, and a section above.
+3. Update its `README.md`, add the module to the root `pom.xml`, and add a row to the table above.
 4. Move a shared source which the new API breaks into the generations' own `src/`.
 
 ## Validation providers

@@ -19,6 +19,7 @@
     <module>jinahya-validation-test-utils-10</module>
   </modules>
 
+  <!-- every version below is documented in README.md, beside this file; keep the two in step -->
   <properties>
     <jakartaee>10</jakartaee>
     <!-- https://jakarta.ee/specifications/platform/10/ ; Jakarta EE 10 requires Java SE 11 or higher -->
