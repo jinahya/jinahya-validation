@@ -186,6 +186,20 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <!-- Hibernate Validator 9 is a named module, which the tests patched into this project's module (in
+                   src/test/java-hibernate-validator) name directly, but which the module, needing only Jakarta
+                   Validation, does not read. -->
+              <argLine>--add-reads io.github.jinahya.validation.util=org.hibernate.validator</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>apache-bval</id>

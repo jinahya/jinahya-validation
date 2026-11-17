@@ -7,10 +7,12 @@ Jakarta Validation extensions, built once per Jakarta EE generation.
 Every artifact carries its Jakarta EE generation in its artifactId; use the ones of the generation you run on, and
 never two generations together, since they share their packages.
 
-| Artifact | Jakarta EE 10 | Jakarta EE 11 |
-| --- | --- | --- |
-| Utilities | `io.github.jinahya:jinahya-validation-utils-10` | `io.github.jinahya:jinahya-validation-utils-11` |
-| Test utilities | `io.github.jinahya:jinahya-validation-test-utils-10` | `io.github.jinahya:jinahya-validation-test-utils-11` |
+| Artifact | Module | Jakarta EE 10 | Jakarta EE 11 |
+| --- | --- | --- | --- |
+| Utilities | `io.github.jinahya.validation.util` | `io.github.jinahya:jinahya-validation-utils-10` | `io.github.jinahya:jinahya-validation-utils-11` |
+| Test utilities | `io.github.jinahya.validation.test.util` | `io.github.jinahya:jinahya-validation-test-utils-10` | `io.github.jinahya:jinahya-validation-test-utils-11` |
+
+Every generation of an artifact is the same module, named after its package.
 
 The Jakarta Validation API is `provided`: your platform, or your own dependency on a validation provider, supplies it.
 
